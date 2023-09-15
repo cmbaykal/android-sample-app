@@ -20,7 +20,9 @@
                 app:nullable="false" />
 
         </action>
-
+        <action
+            android:id="@+id/to_cinemas"
+            app:destination="@id/cinemasFragment" />
     </fragment>
 
     <fragment
@@ -57,5 +59,10 @@
             app:nullable="false" />
 
     </fragment>
+    <fragment
+        android:id="@+id/cinemasFragment"
+        android:name="com.adesso.movee.scene.cinemas.CinemasFragment"
+        android:label="CinemasFragment"
+        tools:layout="@layout/fragment_cinemas"/>
 
 </navigation>

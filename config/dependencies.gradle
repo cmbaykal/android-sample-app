@@ -12,7 +12,7 @@ ext {
     ]
 
     build = [
-            apiKey: System.getenv("API_KEY_TMDB"),
+            apiKey: "6a3250b8b666ace2104278cd40e42255",
     ]
 
     application = [

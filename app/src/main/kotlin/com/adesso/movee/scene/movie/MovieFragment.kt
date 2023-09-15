@@ -27,6 +27,9 @@ class MovieFragment :
         binder.layoutShowHeader.appBarShow.addAppBarStateChangeListener { _, state ->
             viewModel.appbarStateChanged(state)
         }
+        binder.layoutShowHeader.headerFabButton.setOnClickListener {
+            viewModel.navigateCinemasFragment()
+        }
         setShouldRefreshPagingListener()
     }
 
