@@ -43,6 +43,7 @@
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait" />
 
-    </application>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAud1sCXplBNNKNtjfqlqY9AdbA5gGcWSs"/>
 
+    </application>
 </manifest>
