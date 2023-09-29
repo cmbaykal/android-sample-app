@@ -85,4 +85,8 @@
     <string name="login_message_register">Don\'t have an account? Register now</string>
     <!-- endregion -->
 
+    <!-- region Cinemas -->
+    <string name="cinemas_page_title">Cinema</string>
+    <!-- endregion -->
+
 </resources>

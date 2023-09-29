@@ -12,8 +12,7 @@ ext {
     ]
 
     build = [
-            apiKey: "6a3250b8b666ace2104278cd40e42255",
-            yelpKey: "nt23bmXP0fVzqdv2nhwFqf0Aw70m0SmamGwAX-i022-W1QPyGPMXubdYdKh_qOhg7C4myQc2hYaGwvYiobfJDOqA6r6WuQvhjGeM7WonKlGlKnpyQEqoxoUKpu4VZXYx"
+            apiKey: "6a3250b8b666ace2104278cd40e42255"
     ]
 
     application = [
@@ -62,7 +61,9 @@ ext {
             hilt            : '2.44',
             kotlinResult    : '1.1.16',
             paging          : '3.1.1',
-            maps            : '2.15.0'
+            maps            : '2.15.0',
+            mapsServices    : '18.1.0',
+            mapsLocation    : '21.0.1'
     ]
 
     dependency = [
@@ -90,6 +91,7 @@ ext {
                     "androidx.compose.material3:material3",
                     "androidx.compose.foundation:foundation",
                     "androidx.compose.ui:ui",
+                    "androidx.compose.runtime:runtime-livedata",
                     "androidx.compose.ui:ui-tooling-preview",
             ],
 
@@ -104,7 +106,9 @@ ext {
                     "com.jakewharton.timber:timber:$version.timber",
                     "com.michael-bull.kotlin-result:kotlin-result:$version.kotlinResult",
                     "com.google.maps.android:maps-compose:$version.maps",
-                    "com.google.maps.android:maps-compose-utils:$version.maps"
+                    "com.google.maps.android:maps-compose-utils:$version.maps",
+                    "com.google.android.gms:play-services-maps:$version.mapsServices",
+                    "com.google.android.gms:play-services-location:$version.mapsLocation"
             ],
 
             commonKapt = [

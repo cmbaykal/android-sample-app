@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
 
     <application
         android:name=".application.MainApplication"
@@ -43,7 +46,7 @@
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait" />
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="API"/>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAud1sCXplBNNKNtjfqlqY9AdbA5gGcWSs"/>
 
     </application>
 </manifest>
