@@ -75,6 +75,7 @@
                     android:backgroundTint="@android:color/white"
                     android:contentDescription="@null"
                     android:src="@drawable/ic_location"
+                    android:visibility="gone"
                     app:borderWidth="0dp"
                     app:elevation="8dp"
                     app:fabCustomSize="30dp"

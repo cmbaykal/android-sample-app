@@ -1,5 +1,8 @@
 package com.adesso.movee.scene.movie
 
+import android.Manifest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
 import com.adesso.movee.R
 import com.adesso.movee.base.BaseFragment
 import com.adesso.movee.databinding.FragmentMovieBinding
@@ -19,6 +22,12 @@ class MovieFragment :
 
     override val layoutId: Int get() = R.layout.fragment_movie
 
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) {
+        viewModel.navigateCinemasFragment()
+    }
+
     override fun initialize() {
         super.initialize()
 
@@ -27,10 +36,20 @@ class MovieFragment :
         binder.layoutShowHeader.appBarShow.addAppBarStateChangeListener { _, state ->
             viewModel.appbarStateChanged(state)
         }
+        binder.layoutShowHeader.headerFabButton.isVisible = true
         binder.layoutShowHeader.headerFabButton.setOnClickListener {
-            viewModel.navigateCinemasFragment()
+            requestLocationPermission()
         }
         setShouldRefreshPagingListener()
+    }
+
+    private fun requestLocationPermission() {
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
     }
 
     override fun onPopularMovieClick(movie: MovieUiModel) {

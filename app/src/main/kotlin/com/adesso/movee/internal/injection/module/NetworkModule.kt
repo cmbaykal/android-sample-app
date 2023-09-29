@@ -2,6 +2,7 @@ package com.adesso.movee.internal.injection.module
 
 import android.content.Context
 import com.adesso.movee.BuildConfig
+import com.adesso.movee.data.remote.api.CinemaService
 import com.adesso.movee.data.remote.api.LoginService
 import com.adesso.movee.data.remote.api.MovieService
 import com.adesso.movee.data.remote.api.PersonService
@@ -30,6 +31,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -39,6 +41,8 @@ object NetworkModule {
     private const val CLIENT_TIME_OUT = 120L
     private const val CLIENT_CACHE_SIZE = 10 * 1024 * 1024L
     private const val CLIENT_CACHE_DIRECTORY = "http"
+    private const val BASE = "base"
+    private const val OSM = "osm"
 
     /**
      * Create Cache object for OkHttp instance
@@ -104,8 +108,9 @@ object NetworkModule {
     }
 
     @Provides
+    @Named(BASE)
     @Singleton
-    fun provideRetrofit(client: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+    fun provideBaseRetrofit(client: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -114,38 +119,58 @@ object NetworkModule {
     }
 
     @Provides
+    @Named(OSM)
     @Singleton
-    fun provideMovieService(retrofit: Retrofit): MovieService {
+    fun provideOSMRetrofit(client: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.OSM_URL)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .callFactory { client.get().newCall(it) }
+            .build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideMovieService(@Named(BASE) retrofit: Retrofit): MovieService {
         return retrofit.create(MovieService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideTvShowService(retrofit: Retrofit): TvShowService {
+    fun provideTvShowService(@Named(BASE) retrofit: Retrofit): TvShowService {
         return retrofit.create(TvShowService::class.java)
     }
 
     @Provides
     @Singleton
-    fun providePersonService(retrofit: Retrofit): PersonService {
+    fun providePersonService(@Named(BASE) retrofit: Retrofit): PersonService {
         return retrofit.create(PersonService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideSearchService(retrofit: Retrofit): SearchService {
+    fun provideSearchService(@Named(BASE) retrofit: Retrofit): SearchService {
         return retrofit.create(SearchService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideLoginService(retrofit: Retrofit): LoginService {
+    fun provideLoginService(@Named(BASE) retrofit: Retrofit): LoginService {
         return retrofit.create(LoginService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideUserService(retrofit: Retrofit): UserService {
+    fun provideUserService(@Named(BASE) retrofit: Retrofit): UserService {
         return retrofit.create(UserService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCinemaService(
+        @Named(OSM) retrofit: Retrofit
+    ): CinemaService {
+        return retrofit.create(CinemaService::class.java)
     }
 }
