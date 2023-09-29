@@ -7,23 +7,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,36 +30,35 @@ import androidx.core.content.ContextCompat
 import com.adesso.movee.R
 import com.adesso.movee.data.remote.model.cinema.OSMObject
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.LocationSource
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
 @Composable
 fun GoogleMapsComponent(
     permissionsState: Boolean,
     cinemasState: State<List<OSMObject>?>,
+    cinemaState: MutableState<OSMObject?>,
     onLocationChange: (LatLng) -> Unit,
-    onMarkerClick: (OSMObject) -> Unit
 ) {
     val context = LocalContext.current
-
+    val scope = rememberCoroutineScope()
+    val coordinates = remember { mutableStateOf(LatLng(0.0, 0.0)) }
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 11f)
+        position = CameraPosition.fromLatLngZoom(coordinates.value, 11f)
     }
 
     if (permissionsState) {
@@ -95,7 +91,6 @@ fun GoogleMapsComponent(
             )
         )
     }
-
     val mapUiSettings by remember {
         mutableStateOf(
             MapUiSettings(
@@ -111,6 +106,9 @@ fun GoogleMapsComponent(
         properties = mapProperties,
         uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState,
+        onMapClick = {
+            cinemaState.value = null
+        }
     ) {
         cinemasState.value?.forEach { cinema ->
             val markerState = MarkerState(position = LatLng(cinema.lat, cinema.lon))
@@ -122,7 +120,16 @@ fun GoogleMapsComponent(
                 title = cinema.name,
                 infoWindowAnchor = Offset(-0.6f, 0.0f),
                 onClick = {
-                    onMarkerClick.invoke(cinema)
+                    scope.launch {
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newCameraPosition(
+                                CameraPosition(it.position, 12f, 0f, 0f)
+                            ),
+                            durationMs = 600
+                        )
+                        delay(300)
+                        cinemaState.value = cinema
+                    }
                     markerState.showInfoWindow()
                     false
                 }

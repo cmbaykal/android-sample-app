@@ -1,13 +1,9 @@
 package com.adesso.movee.scene.cinemas
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,8 +14,7 @@ import com.adesso.movee.base.BaseFragment
 import com.adesso.movee.data.remote.model.cinema.OSMObject
 import com.adesso.movee.databinding.FragmentCinemasBinding
 import com.adesso.movee.scene.cinemas.components.GoogleMapsComponent
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.adesso.movee.scene.cinemas.components.MapsMarkerDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,7 +27,7 @@ class CinemasFragment : BaseFragment<CinemasViewModel, FragmentCinemasBinding>()
 
         binder.layout.setContent {
             val cinemasState = viewModel.cinemaList.observeAsState()
-            val cinemaDialogState by remember { mutableStateOf<OSMObject?>(null) }
+            var cinemaDialogState = remember { mutableStateOf<OSMObject?>(null) }
 
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -40,13 +35,12 @@ class CinemasFragment : BaseFragment<CinemasViewModel, FragmentCinemasBinding>()
                 GoogleMapsComponent(
                     permissionsState = locationPermission,
                     cinemasState = cinemasState,
+                    cinemaState = cinemaDialogState,
                     onLocationChange = {
                         viewModel.getCinemasOnLocation(it)
-                    },
-                    onMarkerClick = {
-
                     }
                 )
+                MapsMarkerDialog(cinema = cinemaDialogState)
             }
         }
     }
