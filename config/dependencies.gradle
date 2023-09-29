@@ -12,7 +12,7 @@ ext {
     ]
 
     build = [
-            apiKey: "MovieDB-API"
+            apiKey: "6a3250b8b666ace2104278cd40e42255"
     ]
 
     application = [
