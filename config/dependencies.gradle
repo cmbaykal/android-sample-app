@@ -62,7 +62,6 @@ ext {
             kotlinResult    : '1.1.16',
             paging          : '3.1.1',
             maps            : '2.15.0',
-            mapsServices    : '18.1.0',
             mapsLocation    : '21.0.1'
     ]
 
@@ -107,7 +106,6 @@ ext {
                     "com.michael-bull.kotlin-result:kotlin-result:$version.kotlinResult",
                     "com.google.maps.android:maps-compose:$version.maps",
                     "com.google.maps.android:maps-compose-utils:$version.maps",
-                    "com.google.android.gms:play-services-maps:$version.mapsServices",
                     "com.google.android.gms:play-services-location:$version.mapsLocation"
             ],
 

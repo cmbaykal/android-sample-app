@@ -82,6 +82,7 @@ object NetworkModule {
     }
 
     @Provides
+    @Named(BASE)
     @Singleton
     fun provideOkHttpClient(
         @ApplicationContext context: Context,
@@ -110,7 +111,10 @@ object NetworkModule {
     @Provides
     @Named(BASE)
     @Singleton
-    fun provideBaseRetrofit(client: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+    fun provideBaseRetrofit(
+        @Named(BASE) client: Lazy<OkHttpClient>,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -121,14 +125,36 @@ object NetworkModule {
     @Provides
     @Named(OSM)
     @Singleton
-    fun provideOSMRetrofit(client: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+    fun provideOSMOkHttpClient(
+        @ApplicationContext context: Context,
+        loggingInterceptor: HttpLoggingInterceptor,
+        moshi: Moshi
+    ): OkHttpClient {
+
+        val httpClient = OkHttpClient.Builder()
+            .connectTimeout(CLIENT_TIME_OUT, TimeUnit.SECONDS)
+            .readTimeout(CLIENT_TIME_OUT, TimeUnit.SECONDS)
+            .addInterceptor(ChuckerInterceptor(context))
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(ErrorHandlingInterceptor(NetworkHandler(context), moshi))
+            .addInterceptor(RetryAfterInterceptor())
+
+        return httpClient.build()
+    }
+
+    @Provides
+    @Named(OSM)
+    @Singleton
+    fun provideOSMRetrofit(
+        @Named(OSM) client: Lazy<OkHttpClient>,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.OSM_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .callFactory { client.get().newCall(it) }
             .build()
     }
-
 
     @Provides
     @Singleton
@@ -168,9 +194,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideCinemaService(
-        @Named(OSM) retrofit: Retrofit
-    ): CinemaService {
+    fun provideCinemaService(@Named(OSM) retrofit: Retrofit): CinemaService {
         return retrofit.create(CinemaService::class.java)
     }
 }
