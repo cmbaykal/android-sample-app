@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.adesso.movee.base.BaseAndroidViewModel
 import com.adesso.movee.data.remote.model.cinema.OSMObject
 import com.adesso.movee.domain.CinemaSearchUseCase
+import com.adesso.movee.uimodel.CinemaUiModel
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -24,29 +25,24 @@ class CinemasViewModel @Inject constructor(
     application: Application
 ) : BaseAndroidViewModel(application) {
 
-    private val _lastLocation = MutableStateFlow(LatLng(0.0, 0.0))
-    val lastLocation: StateFlow<LatLng> = _lastLocation.asStateFlow()
-
-    private val _cinemaList = MutableStateFlow<List<OSMObject>?>(null)
-    val cinemaList: StateFlow<List<OSMObject>?> = _cinemaList.asStateFlow()
+    private val _uiModel = MutableStateFlow(CinemaUiModel())
+    val uiModel: StateFlow<CinemaUiModel> = _uiModel
 
     @SuppressLint("MissingPermission")
     fun getLocation() {
         viewModelScope.launch {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener {
-                _lastLocation.value = LatLng(it.latitude, it.longitude)
-                return@addOnSuccessListener
+                val coordinates = LatLng(it.latitude, it.longitude)
+                _uiModel.value = _uiModel.value.copy(lastLocation = coordinates)
+                getCinemasOnLocation(coordinates)
             }
         }
     }
 
-    fun setLocation(latLng: LatLng) {
-        _lastLocation.value = latLng
-    }
+    fun getCinemasOnLocation(coordinates: LatLng?) {
+        if (coordinates == null) return
 
-    fun getCinemasOnLocation(coordinates: LatLng) {
-        if (coordinates.latitude == 0.0 && coordinates.longitude == 0.0) return
-
+        _uiModel.value = _uiModel.value.copy(searchVisibility = false)
         val query = "${coordinates.latitude},${coordinates.longitude} cinema"
         viewModelScope.launch {
             val result = cinemaSearchUseCase.run(query)
@@ -54,12 +50,24 @@ class CinemasViewModel @Inject constructor(
             runOnViewModelScope {
                 result
                     .onSuccess {
-                        _cinemaList.value = it
+                        _uiModel.value = _uiModel.value.copy(cinemaList = it)
                     }
                     .onFailure {
-                        _cinemaList.value = emptyList()
+                        _uiModel.value = _uiModel.value.copy(cinemaList = emptyList())
                     }
             }
         }
+    }
+
+    fun setSelectedCinema(cinema: OSMObject) {
+        _uiModel.value = _uiModel.value.copy(selectedCinema = cinema, dialogVisibility = true)
+    }
+
+    fun setDialogVisibility(visibility: Boolean) {
+        _uiModel.value = _uiModel.value.copy(dialogVisibility = visibility)
+    }
+
+    fun setSearchVisibility(visibility: Boolean) {
+        _uiModel.value = _uiModel.value.copy(searchVisibility = visibility)
     }
 }

@@ -49,11 +49,11 @@ fun MapsMarker(
         icon = icon,
         title = title,
         onClick = {
-            if (title != null) {
+            if (!title.isNullOrEmpty()) {
                 it.showInfoWindow()
             }
             onClick(it)
-            false
+            true
         }
     ) {
         val color = colorResource(R.color.charcoal_grey_2)
@@ -81,7 +81,7 @@ fun MapsMarker(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .size(30.dp)
-                    .offset(y = (-15).dp),
+                    .offset(y = (-16).dp),
                 painter = painterResource(id = R.drawable.ic_arrow_down),
                 tint = color,
                 contentDescription = null

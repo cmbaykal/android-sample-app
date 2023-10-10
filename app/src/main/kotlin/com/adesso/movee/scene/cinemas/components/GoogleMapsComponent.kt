@@ -1,7 +1,5 @@
 package com.adesso.movee.scene.cinemas.components
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,18 +11,18 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.GoogleMapComposable
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 
-@SuppressLint("MissingPermission")
 @Composable
 fun GoogleMapsComponent(
+    modifier: Modifier = Modifier,
     cameraPositionState: CameraPositionState,
     onMapClick: (LatLng) -> Unit,
-    content: @Composable () -> Unit,
+    content: (@Composable @GoogleMapComposable () -> Unit)?,
 ) {
     val context = LocalContext.current
-
     val mapProperties by remember {
         mutableStateOf(
             MapProperties(
@@ -43,12 +41,13 @@ fun GoogleMapsComponent(
                 mapToolbarEnabled = false,
                 compassEnabled = false,
                 zoomControlsEnabled = false,
+                myLocationButtonEnabled = true
             )
         )
     }
 
     GoogleMap(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         properties = mapProperties,
         uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState,

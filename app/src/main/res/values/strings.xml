@@ -87,6 +87,7 @@
 
     <!-- region Cinemas -->
     <string name="cinemas_page_title">Cinema</string>
+    <string name="search_cinema_button_text">Search Cinema</string>
     <!-- endregion -->
 
 </resources>
